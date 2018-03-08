@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+set -x
+
+PEPPER_SRC=${PEPPER_SRC:-https://github.com/pepper-project/pepper.git}
+THIRDPARTY_SRC=${THIRDPARTY_SRC:-https://github.com/pepper-project/thirdparty.git}
+[ ! -d pepper ] && git clone --recursive $PEPPER_SRC pepper
+cd pepper
+git submodule init
+git submodule update
+cd ..
+[ ! -d jsnark ] && git clone --recursive $THIRDPARTY_SRC thirdparty
+cd pepper/compiler/buffetfsm/
+[ ! -d llvm ] && tar xjvf ../../../thirdparty/llvm_clang-r209914-patched-buffet_fsm_patch.tar.bz2
+mkdir toolchain
+mkdir llvm-build
+cd llvm-build
+$PWD/../llvm/configure --prefix=$PWD/../toolchain --enable-shared --enable-optimized
+make -j$(nproc)
+cd ../../..
+cd libsnark
+./prepare-depends.sh
+make lib STATIC=1 NO_PROCPS=1
