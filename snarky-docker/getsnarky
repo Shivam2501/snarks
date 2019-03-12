@@ -1,9 +1,0 @@
-#!/bin/bash
-set -e
-set -x
-
-SNARKY_SRC=${SNARKY_SRC:-https://github.com/o1-labs/snarky.git}
-[ ! -d snarky ] && git clone --recursive $SNARKY_SRC snarky
-
-eval `opam config env`
-opam pin add -y snarky
